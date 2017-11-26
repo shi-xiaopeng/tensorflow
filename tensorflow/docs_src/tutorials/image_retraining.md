@@ -149,32 +149,48 @@ labeled with the correct class.
 训练准确度显示当前训练所用的图片被正确分类的百分比。
 The validation accuracy is the precision on a randomly-selected group of images from a different set. 
 验证的准确度指从另一个集合中随机选出的一组图片被正确分类的百分比。
-The key difference is
-that the training accuracy is based on images that the network has been able
-to learn from so the network can overfit to the noise in the training data. A
-true measure of the performance of the network is to measure its performance on
+The key difference is that the training accuracy is based on images that the network has been able
+to learn from so the network can overfit to the noise in the training data.
+上面两个指标的关键差别在于，训练正确度的计算是依据网络已经学习过的那些图片，因此网络能够对训练数据中的噪声过拟合。
+A true measure of the performance of the network is to measure its performance on
 a data set not contained in the training data -- this is measured by the
-validation accuracy. If the train accuracy is high but the validation accuracy
+validation accuracy. 
+衡量一个网络表现的真正标准应该是它在训练数据集之外的数据上的表现 -- 通过验证正确性这个指标来衡量。
+If the train accuracy is high but the validation accuracy
 remains low, that means the network is overfitting and memorizing particular
-features in the training images that aren't helpful more generally. Cross
-entropy is a loss function which gives a glimpse into how well the learning
-process is progressing. The training's objective is to make the loss as small as
+features in the training images that aren't helpful more generally. 
+如果训练准确定很高，验证准确定却很低，说明网络过拟合了，它已经记住了训练图片的特有的特征，这无助于更加通用的识别。
+Cross entropy is a loss function which gives a glimpse into how well the learning
+process is progressing. 
+交叉熵是一个可以让我们一瞥学习进行情况的损失函数。
+The training's objective is to make the loss as small as
 possible, so you can tell if the learning is working by keeping an eye on
 whether the loss keeps trending downwards, ignoring the short-term noise.
-
+训练的目标是让这个损失函数的值尽可能的小，所以通过观察忽略短期噪声情况下
+损失函数是否趋势递减来判断学习过程的进行状况。
 By default this script will run 4,000 training steps. Each step chooses ten
 images at random from the training set, finds their bottlenecks from the cache,
-and feeds them into the final layer to get predictions. Those predictions are
-then compared against the actual labels to update the final layer's weights
-through the back-propagation process. As the process continues you should see
+and feeds them into the final layer to get predictions. 
+默认情况下，这个脚本会执行 4000 次训练。每次训练会从训练集中随机选取 10 张图片，从缓存中找到
+他们的 bottleneck 值，把他们传给最后一层来获得预测结果。
+Those predictions are then compared against the actual labels to update the final layer's weights
+through the back-propagation process. 
+这些预测值随后会与真实的标签值进行比较，并通过反向传播过程对优化最后一层的权重分布。
+As the process continues you should see
 the reported accuracy improve, and after all the steps are done, a final test
 accuracy evaluation is run on a set of images kept separate from the training
-and validation pictures. This test evaluation is the best estimate of how the
-trained model will perform on the classification task. You should see an
-accuracy value of between 90% and 95%, though the exact value will vary from run
-to run since there's randomness in the training process. This number is based on
-the percent of the images in the test set that are given the correct label
+and validation pictures.
+随着这一过程的进行你会看到报告的准确性在提升，当所有的训练步骤完成后，
+会在一个独立于测试集和验证集的图片集合上进行最终的测试准确性评估。
+This test evaluation is the best estimate of how the
+trained model will perform on the classification task.
+这个测试评估是对这个训练模型在分类任务中表现如何的最好估测。
+You should see an accuracy value of between 90% and 95%, though the exact value will vary from run
+to run since there's randomness in the training process.
+你会看到一个介于 90% 和 95% 的准确性值，尽管每一次运行的确切值都不同，因为训练过程有随机性存在。
+This number is based on the percent of the images in the test set that are given the correct label
 after the model is fully trained.
+这个值是模型训练完成后对测试图片集正确分类的比例。
 
 ## Visualizing the Retraining with TensorBoard
 
