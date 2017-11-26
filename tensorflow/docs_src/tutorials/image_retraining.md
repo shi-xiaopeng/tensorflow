@@ -1,5 +1,5 @@
 # How to Retrain Inception's Final Layer for New Categories
-# 如何重新训练 Inception 的最后一层生成新分类
+# 如何再训练 Inception 的最后一层识别新分类
 Modern object recognition models have millions of parameters and can take weeks
 to fully train. Transfer learning is a technique that shortcuts a lot of this
 work by taking a fully-trained model for a set of categories like ImageNet, and
