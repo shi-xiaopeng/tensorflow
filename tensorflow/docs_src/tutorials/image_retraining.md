@@ -7,6 +7,7 @@ retrains from the existing weights for new classes. In this example we'll be
 retraining the final layer from scratch, while leaving all the others untouched.
 For more information on the approach you can see
 [this paper on Decaf](https://arxiv.org/pdf/1310.1531v1.pdf).
+
 当前的对象识别模型拥有数十万计的参数，花费数周的时间来整个训练。迁移学习是一种技术，这种技术能够大幅缩短这一过程，
 通过将一个已经完整训练过的模型如 ImageNet 重新训练来获得新的分类。在本例中我们将重新训练一个模型的最后一层，
 保留所有其他的不变。
@@ -17,6 +18,7 @@ for many applications, and can be run in as little as thirty minutes on a
 laptop, without requiring a GPU. This tutorial will show you how to run the
 example script on your own images, and will explain some of the options you have
 to help control the training process.
+
 尽管这总方式的效果没有完整训练的好，这种方法对很多应用惊人的有效，而且能在一个没有 GPU 的笔记本上 30 分钟内完成训练。
 这篇教程将展示如何在你自己的图片上执行示例脚本，而且会讲解一些你将会用到的，用于控制训练过程的一些选项。
 
@@ -24,19 +26,30 @@ Note: This version of the tutorial mainly uses bazel. A bazel free version is
 also available
 [as a codelab](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/#0).
 
+注：此版本的教程主要使用 bazel。下面给出一个 bazel 的免费版本作为一个【代码库】
+(https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/#0).
+
 [TOC]
 
 ## Training on Flowers
+## 训练对花的识别
 
 ![Daisies by Kelly Sikkema](https://www.tensorflow.org/images/daisies.jpg)
 
 [Image by Kelly Sikkema](https://www.flickr.com/photos/95072945@N05/9922116524/)
+
+[Kelly Sikkema 提供](https://www.flickr.com/photos/95072945@N05/9922116524/)
 
 Before you start any training, you'll need a set of images to teach the network
 about the new classes you want to recognize. There's a later section that
 explains how to prepare your own images, but to make it easy we've created an
 archive of creative-commons licensed flower photos to use initially. To get the
 set of flower photos, run these commands:
+
+在开始任何训练之前，你需要一组图片，用于教网络认识你想让网络识别的那个新分类。
+具体如何准备你自己的图片库我们将在后面的部分讲解，为了使讲解更容易我们创建了一个
+包含知识共享授权花的图片的文件夹用于我们的初始化。
+获取这些花朵图片，可以执行以下命令：
 
 ```sh
 cd ~
@@ -47,6 +60,8 @@ tar xzf flower_photos.tgz
 Once you have the images, you can build the retrainer like this, from the root
 of your TensorFlow source directory:
 
+获得这些图片后，你可以再你的 TensorFlow 源码文件的根目录下创建一个 retrainer :
+
 ```sh
 bazel build tensorflow/examples/image_retraining:retrain
 ```
@@ -56,11 +71,16 @@ If you have a machine which supports
 (common in x86 CPUs produced in the last few years) you can improve the running
 speed of the retraining by building for that architecture, like this (after choosing appropriate options in `configure`):
 
+如果你有一个支持[AVX 指令集](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)(常见于最近几年中生产的 x86 CPU 中)
+你可以通过构建那种结构来提升再训练的运行速度，构建方式如下（在 `configure` 中选择合适的选项之后）:
+
 ```sh
 bazel build --config opt tensorflow/examples/image_retraining:retrain
 ```
 
 The retrainer can then be run like this:
+
+再训练器通过如下方式执行：
 
 ```sh
 bazel-bin/tensorflow/examples/image_retraining/retrain --image_dir ~/flower_photos
@@ -73,20 +93,37 @@ The magic of transfer learning is that lower layers that have been trained to
 distinguish between some objects can be reused for many recognition tasks
 without any alteration.
 
+这行代码加载了先前训练的 Inception v3 模型，移去最顶层，在你下载的花朵图片上训练生成新的最顶层。
+先前完整训练的生成的原始 ImageNet 分类中不存在任何一种花的类型。迁移学习的神奇之处就在于
+之前的训练已经使识别网络的低层级能够识别不同的对象，可以在其他很多识别任务中重用而不用做任何修改。
+
+
 ## Bottlenecks
+## 瓶颈
 
 The script can take thirty minutes or more to complete, depending on the speed
-of your machine. The first phase analyzes all the images on disk and calculates
+of your machine.
+根据你的机器速度的不同，这个脚本可能需要 30 分钟或更长时间才能完成，
+The first phase analyzes all the images on disk and calculates
 the bottleneck values for each of them. 'Bottleneck' is an informal term we
 often use for the layer just before the final output layer that actually does
-the classification. This penultimate layer has been trained to output a set of
+the classification.
+第一个阶段会分析磁盘上的所有图片并计算出每一个的 Bottleneck 值。'Bottleneck' 是一个非正式词汇，
+我们经常用它指代最后的输出层也就是最终做分类的那一层的前一层。
+
+This penultimate layer has been trained to output a set of
 values that's good enough for the classifier to use to distinguish between all
-the classes it's been asked to recognize. That means it has to be a meaningful
+the classes it's been asked to recognize. 
+这个倒数第二层已经被训练并能够输出一组值，这组值已经好到可以让分类器依据这些值来完成它的分类任务。
+That means it has to be a meaningful
 and compact summary of the images, since it has to contain enough information
-for the classifier to make a good choice in a very small set of values. The
-reason our final layer retraining can work on new classes is that it turns out
+for the classifier to make a good choice in a very small set of values. 
+这意味着这些值必须是这些图片的精简而有意义的总结，因为它要包含足够的信息
+来让分类器在一个很小的数值区间中做出好的选择。
+The reason our final layer retraining can work on new classes is that it turns out
 the kind of information needed to distinguish between all the 1,000 classes in
 ImageNet is often also useful to distinguish between new kinds of objects.
+最后一层的重新训练能够识别新分类的原因是，用于分辨 1000 中分类的信息对于识别新分类通常也时分有用。
 
 Because every image is reused multiple times during training and calculating
 each bottleneck takes a significant amount of time, it speeds things up to
@@ -94,15 +131,25 @@ cache these bottleneck values on disk so they don't have to be repeatedly
 recalculated. By default they're stored in the `/tmp/bottleneck` directory, and
 if you rerun the script they'll be reused so you don't have to wait for this
 part again.
+由于在训练和计算 bottleneck 值时每一图片都会被多次使用，因此把计算过的 bottleneck 值缓存在磁盘中
+会大幅提升训练的速度，因为不用再重复计算了。bottleneck 值默认保存在 `/tmp/bottleneck` 目录下，
+如果重复执行脚本他们会被重用，因此训练用时会比第一次训练要短。
 
 ## Training
+## 训练
 
 Once the bottlenecks are complete, the actual training of the top layer of the
-network begins. You'll see a series of step outputs, each one showing training
-accuracy, validation accuracy, and the cross entropy. The training accuracy
-shows what percent of the images used in the current training batch were
-labeled with the correct class. The validation accuracy is the precision on a
-randomly-selected group of images from a different set. The key difference is
+network begins. 
+bottleneck 值计算完成后，网络的顶层训练才真正开始。
+You'll see a series of step outputs, each one showing training
+accuracy, validation accuracy, and the cross entropy. 
+你将看到一系列步骤的输出，每一天都会显示训练的精确度、验证的精确度以及交叉熵。
+The training accuracy shows what percent of the images used in the current training batch were
+labeled with the correct class. 
+训练准确度显示当前训练所用的图片被正确分类的百分比。
+The validation accuracy is the precision on a randomly-selected group of images from a different set. 
+验证的准确度指从另一个集合中随机选出的一组图片被正确分类的百分比。
+The key difference is
 that the training accuracy is based on images that the network has been able
 to learn from so the network can overfit to the noise in the training data. A
 true measure of the performance of the network is to measure its performance on
