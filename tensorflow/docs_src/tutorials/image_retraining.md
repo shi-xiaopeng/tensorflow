@@ -1,5 +1,5 @@
 # How to Retrain Inception's Final Layer for New Categories
-
+# 如何重新训练 Inception 的最后一层生成新分类
 Modern object recognition models have millions of parameters and can take weeks
 to fully train. Transfer learning is a technique that shortcuts a lot of this
 work by taking a fully-trained model for a set of categories like ImageNet, and
@@ -7,12 +7,18 @@ retrains from the existing weights for new classes. In this example we'll be
 retraining the final layer from scratch, while leaving all the others untouched.
 For more information on the approach you can see
 [this paper on Decaf](https://arxiv.org/pdf/1310.1531v1.pdf).
+当前的对象识别模型拥有数十万计的参数，花费数周的时间来整个训练。迁移学习是一种技术，这种技术能够大幅缩短这一过程，
+通过将一个已经完整训练过的模型如 ImageNet 重新训练来获得新的分类。在本例中我们将重新训练一个模型的最后一层，
+保留所有其他的不变。
+获得此方法的更多信息请参考[ Decaf 的这篇论文](https://arxiv.org/pdf/1310.1531v1.pdf).
 
 Though it's not as good as a full training run, this is surprisingly effective
 for many applications, and can be run in as little as thirty minutes on a
 laptop, without requiring a GPU. This tutorial will show you how to run the
 example script on your own images, and will explain some of the options you have
 to help control the training process.
+尽管这总方式的效果没有完整训练的好，这种方法对很多应用惊人的有效，而且能在一个没有 GPU 的笔记本上 30 分钟内完成训练。
+这篇教程将展示如何在你自己的图片上执行示例脚本，而且会讲解一些你将会用到的，用于控制训练过程的一些选项。
 
 Note: This version of the tutorial mainly uses bazel. A bazel free version is
 also available
