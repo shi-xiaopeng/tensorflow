@@ -213,18 +213,23 @@ The [TensorBoard's GitHub](https://github.com/tensorflow/tensorboard) has a lot 
 【TensorBoard 的 GitHub 主页】(https://github.com/tensorflow/tensorboard) 有 TensorBoard 用法的更多信息，
 包括一些小的提示，技巧和调试信息。
 ## Using the Retrained Model
-## 使用在训练模型
+## 再训练模型的使用
 The script will write out a version of the Inception v3 network with a final
 layer retrained to your categories to /tmp/output_graph.pb, and a text file
-containing the labels to /tmp/output_labels.txt. These are both in a format that
+containing the labels to /tmp/output_labels.txt. 
+下面的脚本将产生一个版本的 Inception v3 网络，其最后一层已经使用 `/tmp/output_graph.pb` 下的分类
+以及 `/tmp/output_labels.txt` 下的标签训练完毕。
+These are both in a format that
 the @{$image_recognition$C++ and Python image classification examples}
 can read in, so you can start using your new model immediately. Since you've
 replaced the top layer, you will need to specify the new name in the script, for
 example with the flag `--output_layer=final_result` if you're using label_image.
-
+这些都是以图像识别 C++ 以及 Python 图像分类能够读取的格式存储，所以你可以立即使用这些新模型。
+由于你替换了顶层节点，所以你需要在脚本中指定一个新名字，例如如果你正在使用 label_image 的话，
+你可以使用 `--output_layer=final_result` 标志进行改变。
 Here's an example of how to build and run the label_image example with your
 retrained graphs:
-
+下面的例子将展示如何使用你已经训练过的图来构建和运行 label_image 示例。
 ```sh
 bazel build tensorflow/examples/image_retraining:label_image && \
 bazel-bin/tensorflow/examples/image_retraining/label_image \
@@ -237,35 +242,43 @@ You should see a list of flower labels, in most cases with daisy on top
 (though each retrained model may be slightly different). You can replace the
 `--image` parameter with your own images to try those out, and use the C++ code
 as a template to integrate with your own applications.
+你将看到一组话的标签，大多数情况下以雏菊开头（尽管每个在训练模型可能有稍有区别）。你可以将
+`--image` 的参数指定为你自己的图片来把之前的替换掉，并使用 C++ 代码作为模板来创建你自己的应用。
 
 If you'd like to use the retrained model in your own Python program, then the
 above
 [`label_image` script](https://www.tensorflow.org/code/tensorflow/examples/image_retraining/label_image.py)
 is a reasonable starting point.
-
+如果你要在自己的 Python 程序中使用再训练模型，上面的[`label_image` 脚本](https://www.tensorflow.org/code/tensorflow/examples/image_retraining/label_image.py)
+会是一个很好的开始模板。
 If you find the default Inception v3 model is too large or slow for your
 application, take a look at the [Other Model Architectures section](/tutorials/image_retraining#other_model_architectures)
 below for options to speed up and slim down your network.
+如果你觉得标准的 Inception v3 模型太大或者会使你你的程序变慢，你可以在[其他的模型结构](/tutorials/image_retraining#other_model_architectures)
+寻找其他可以提升速度或者瘦身的方案。
 
 ## Training on Your Own Categories
-
+## 在你自己的分类上进行训练
 If you've managed to get the script working on the flower example images, you
 can start looking at teaching it to recognize categories you care about instead.
+如果你能够成功运行分类实例花朵图片的代码，你可以教他识别你关心的新分类。
 In theory all you'll need to do is point it at a set of sub-folders, each named
 after one of your categories and containing only images from that category. If
 you do that and pass the root folder of the subdirectories as the argument to
 `--image_dir`, the script should train just like it did for the flowers.
-
+理论上所有你需要做的只是将训练对象指向一组新的子文件夹，每一个都你要训练的新分类命名，而且只包含符合这个分类的图片。
+完成之后将这些子目录的上层根目录作为参数传给 `--image_dir`，脚本会像之前训练识别花朵一样完成训练过程。
 Here's what the folder structure of the flowers archive looks like, to give you
 and example of the kind of layout the script is looking for:
-
+为了说明脚本搜寻的文件目录结构是怎样的，下图是花朵文件夹的目录结构：
 ![Folder Structure](https://www.tensorflow.org/images/folder_structure.png)
+![目录结构](https://www.tensorflow.org/images/folder_structure.png)
 
 In practice it may take some work to get the accuracy you want. I'll try to
 guide you through some of the common problems you might encounter below.
-
+实际操作中为了得到想要的准确性可能要做很多工作。我将通过下面一些你可能会遇到的常见问题进行讲解。
 ## Creating a Set of Training Images
-
+## 常见一个用于训练的图片集
 The first place to start is by looking at the images you've gathered, since the
 most common issues we see with training come from the data that's being fed in.
 
