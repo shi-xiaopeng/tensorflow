@@ -193,23 +193,27 @@ after the model is fully trained.
 这个值是模型训练完成后对测试图片集正确分类的比例。
 
 ## Visualizing the Retraining with TensorBoard
+## 使用 TensorBoard 可视化再训练过程
 
 The script includes TensorBoard summaries that make it easier to understand, debug, and optimize the retraining. For example, you can visualize the graph and statistics, such as how the weights or accuracy varied during training.
 
-To launch TensorBoard, run this command during or after retraining:
+这些脚本包括 TensorBoard 的简要介绍，使得理解，调试和优化过程更易理解。例如，你可以可视化诸如训练过程中的权重和准确性变化的图表和统计数据。
 
+To launch TensorBoard, run this command during or after retraining:
+要启动 TensorBoard 请在训练过程中或训练完成后执行以下命令：
 ```sh
 tensorboard --logdir /tmp/retrain_logs
 ```
 
 Once TensorBoard is running, navigate your web browser to `localhost:6006` to view the TensorBoard.
-
+TensorBoard 运行之后，打开浏览器进到 `localhost:6006` 地址去看 TensorBoard 的状态。
 The script will log TensorBoard summaries to `/tmp/retrain_logs` by default. You can change the directory with the `--summaries_dir` flag.
-
+上面的脚本默认会将 TensorBoard 的运行日志记录到 `/tmp/retrain_logs`目录下。你也可以使用 `--summaries_dir` 标记来改变存储目录。
 The [TensorBoard's GitHub](https://github.com/tensorflow/tensorboard) has a lot more information on TensorBoard usage, including tips & tricks, and debugging information.
-
+【TensorBoard 的 GitHub 主页】(https://github.com/tensorflow/tensorboard) 有 TensorBoard 用法的更多信息，
+包括一些小的提示，技巧和调试信息。
 ## Using the Retrained Model
-
+## 使用在训练模型
 The script will write out a version of the Inception v3 network with a final
 layer retrained to your categories to /tmp/output_graph.pb, and a text file
 containing the labels to /tmp/output_labels.txt. These are both in a format that
