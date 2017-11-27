@@ -278,10 +278,10 @@ In practice it may take some work to get the accuracy you want. I'll try to
 guide you through some of the common problems you might encounter below.
 实际操作中为了得到想要的准确性可能要做很多工作。我将通过下面一些你可能会遇到的常见问题进行讲解。
 ## Creating a Set of Training Images
-## 常见一个用于训练的图片集
+## 创建一个用于训练的图片集
 The first place to start is by looking at the images you've gathered, since the
 most common issues we see with training come from the data that's being fed in.
-
+我们要注意的第一个地方就是你所搜集的图片，我们发现训练过程中最容易出问题的是你输入的数据。
 For training to work well, you should gather at least a hundred photos of each
 kind of object you want to recognize. The more you can gather, the better the
 accuracy of your trained model is likely to be. You also need to make sure that
@@ -289,7 +289,10 @@ the photos are a good representation of what your application will actually
 encounter. For example, if you take all your photos indoors against a blank wall
 and your users are trying to recognize objects outdoors, you probably won't see
 good results when you deploy.
-
+为了能使训练工作正常进行，你需要为你要训练识别的每个分类至少准备 100 张图片。你搜集的图片越多，
+你训练出的模型越可能拥有更好的准确性。你同样需要确保你搜集的图片是你的应用将要识别的任务的很好的代表。
+例如，你使用的图片都是背景是空樯的室内照片，而你的用户尝试去识别室外的物体，
+当应用部署时你不会看到有好的效果
 Another pitfall to avoid is that the learning process will pick up on anything
 that the labeled images have in common with each other, and if you're not
 careful that might be something that's not useful. For example if you photograph
