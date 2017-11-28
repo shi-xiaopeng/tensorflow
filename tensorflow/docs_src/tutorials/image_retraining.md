@@ -295,70 +295,101 @@ good results when you deploy.
 当应用部署时你不会看到有好的效果
 Another pitfall to avoid is that the learning process will pick up on anything
 that the labeled images have in common with each other, and if you're not
-careful that might be something that's not useful. For example if you photograph
-one kind of object in a blue room, and another in a green one, then the model
+careful that might be something that's not useful. 
+另一个要避免的陷阱是学习过程会学习标签图片之间任何的相同之处，留意不要让它成为阻碍你的地方。
+For example if you photograph one kind of object in a blue room, and another in a green one, then the model
 will end up basing its prediction on the background color, not the features of
-the object you actually care about. To avoid this, try to take pictures in as
+the object you actually care about. 
+例如，如果你在蓝色的房间里给一个物体拍照，在另一个绿色的房间里给另一个物体拍照，那么最终模型将根据
+背景的颜色给出预测，而不是依据你真正关心的物体特征。
+To avoid this, try to take pictures in as
 wide a variety of situations as you can, at different times, and with different
 devices. If you want to know more about this problem, you can read about the
 classic (and possibly apocryphal)
 [tank recognition problem](https://www.jefftk.com/p/detecting-tanks).
+为了避开这个陷阱，你要尽可能的在各种不同的环境中进行拍摄照片，不同的时间，使用不同的设备。
+如果你想了解更多关于此问题的信息，你可以看一下经典的（也可能是杜撰的）
+[坦克识别问题](https://www.jefftk.com/p/detecting-tanks).
 
 You may also want to think about the categories you use. It might be worth
 splitting big categories that cover a lot of different physical forms into
-smaller ones that are more visually distinct. For example instead of 'vehicle'
-you might use 'car', 'motorbike', and 'truck'. It's also worth thinking about
-whether you have a 'closed world' or an 'open world' problem. In a closed world,
-the only things you'll ever be asked to categorize are the classes of object you
+smaller ones that are more visually distinct. 
+你同样需要考虑你要要使用的分类。应该将涵盖很多不同不同物理形体的大分类分割成在视觉上不同的小分类。
+For example instead of 'vehicle' you might use 'car', 'motorbike', and 'truck'.
+例如，应该使用 `car`, `motorbike` 和 `truck` 来代替 `vehicle`
+It's also worth thinking about whether you have a 'closed world' or an 'open world' problem.
+你同样应该思考你要解决的是一个封闭性问题还是一个开放性问题。
+In a closed world, the only things you'll ever be asked to categorize are the classes of object you
 know about. This might apply to a plant recognition app where you know the user
 is likely to be taking a picture of a flower, so all you have to do is decide
 which species. By contrast a roaming robot might see all sorts of different
-things through its camera as it wanders around the world. In that case you'd
-want the classifier to report if it wasn't sure what it was seeing. This can be
+things through its camera as it wanders around the world.
+在封闭性问题中，你面对的问题只是识别你已经知道的的物体类别。这可以应用在一个植物识别应用中，
+用户将拍摄一朵花的图片，你所要做的只是判定它的品类。
+而一个满世界乱逛的漫游机器人可能通过它的相机看到各种各样的东西。
+In that case you'd want the classifier to report if it wasn't sure what it was seeing. This can be
 hard to do well, but often if you collect a large number of typical 'background'
 photos with no relevant objects in them, you can add them to an extra 'unknown'
 class in your image folders.
+在那种情况下你可能需要分类器报告它是否确定你正在观察的东西。这可能很难做好，通常当你收集到一大批
+典型的除了背景之外没什么东西的图片，你可以把他们加到额外的名为 unknown 的文件夹中。
 
 It's also worth checking to make sure that all of your images are labeled
 correctly. Often user-generated tags are unreliable for our purposes, for
 example using #daisy for pictures of a person named Daisy. If you go through
 your images and weed out any mistakes it can do wonders for your overall
 accuracy.
-
+检查确认所有的图片都与其标签相符合也是值得的。用户生成的标签经常性的并不可靠，例如使用标签 daisy 打给了
+一个名叫 daisy 的人。如果你检查了所有的图片并排除了其中的错误，你会发现这对你模型整体的准确性有惊人的提升。
 ## Training Steps
-
+## 训练步骤
 If you're happy with your images, you can take a look at improving your results
 by altering the details of the learning process. The simplest one to try is
-`--how_many_training_steps`. This defaults to 4,000, but if you increase it to
+`--how_many_training_steps`. 
+如果你对你的图片很满意，你可以看一下通过调整学习过程来改善你的结果。最简单的一个选项是
+`--how_many_training_steps`
+This defaults to 4,000, but if you increase it to
 8,000 it will train for twice as long. The rate of improvement in the accuracy
 slows the longer you train for, and at some point will stop altogether, but you
 can experiment to see when you hit that limit for your model.
+这个选项默认是 4000，但是你可以把它调高到 8000，这样它大概需要两倍的时间完成训练。训练时间越长，
+准确性的提高速率就会越低，最终准确性会停在某个点上，不过你可以实验一下你的模型什么时候会达到这个限制。
 
 ## Distortions
-
+## 扭曲失真
 A common way of improving the results of image training is by deforming,
-cropping, or brightening the training inputs in random ways. This has the
-advantage of expanding the effective size of the training data thanks to all the
+cropping, or brightening the training inputs in random ways.
+改善图片训练结果的一个一般方法是以随机的方式变形、裁剪或调亮训练的输入。
+This has the advantage of expanding the effective size of the training data thanks to all the
 possible variations of the same images, and tends to help the network learn to
 cope with all the distortions that will occur in real-life uses of the
-classifier. The biggest disadvantage of enabling these distortions in our script
+classifier. 
+由于同一张图片可以衍生出各种可能的变种，这可以扩展有效训练数据集的大小，而且这可以帮助网络学习
+应对各种变形，这种变形在现实生活的使用中会经常碰到。
+The biggest disadvantage of enabling these distortions in our script
 is that the bottleneck caching is no longer useful, since input images are never
 reused exactly. This means the training process takes a lot longer, so I
 recommend trying this as a way of fine-tuning your model once you've got one
 that you're reasonably happy with.
-
+允许变形输入的最主要缺陷是代码中对 bottleneck 的缓存将不再有效，因为输入的图片不会再被重复使用。
+这意味着训练过程将多花很多时间，因此我建议只是将这种方法作为你已经训练完成一个模型之后的一种对模型调优的方法。
 You enable these distortions by passing `--random_crop`, `--random_scale` and
 `--random_brightness` to the script. These are all percentage values that
-control how much of each of the distortions is applied to each image. It's
-reasonable to start with values of 5 or 10 for each of them and then experiment
+control how much of each of the distortions is applied to each image. 
+你可以通过传入 `--random_crop`，`--random_scale`，以及 `--random_brightness` 开启扭曲功能。
+这些都是控制这些扭曲方法作用于每张图片程度的百分比值。
+It's reasonable to start with values of 5 or 10 for each of them and then experiment
 to see which of them help with your application. `--flip_left_right` will
 randomly mirror half of the images horizontally, which makes sense as long as
 those inversions are likely to happen in your application. For example it
 wouldn't be a good idea if you were trying to recognize letters, since flipping
 them destroys their meaning.
+开始时给每个选项设置 5 或 10 是合理的，然后再实验具体哪些值会对你的应用有所帮助。
+`--flip_left_right` 将随机地水平镜面反映一半的图像，只要这些镜面对称图像有可能出现在你的应用中，
+你设置此选项就是合理的。例如镜面对称出现在文字识别中就不是一个好主意，因为文字的反转会破坏它们的语义。
 
 ## Hyper-parameters
-
+## 高层参数
 There are several other parameters you can try adjusting to see if they help
 your results. The `--learning_rate` controls the magnitude of the updates to the
 final layer during training. Intuitively if this is smaller then the learning
@@ -368,6 +399,11 @@ for your case. The `--train_batch_size` controls how many images are examined
 during one training step, and because the learning rate is applied per batch
 you'll need to reduce it if you have larger batches to get the same overall
 effect.
+你还可以调节另外几个参数，看它们是否会对你的结果有所帮助。`--learning_rate` 控制
+训练过程中对最后一层进行更新的量级。直观的可以知道，如果这个值更小，那么学习过长将更长，
+但是却对最终整体的精确性有所帮助。情况也并不总是如此，因此你需要仔细的实验确认哪种情况对你有效。
+`--train_batch_size` 控制一次训练步骤有多少图片会被检测。由于学习速率应用于每一个批次，
+所以想每批使用更多的图片而整体效果不变，你需要减小学习速率。
 
 ## Training, Validation, and Testing Sets
 
