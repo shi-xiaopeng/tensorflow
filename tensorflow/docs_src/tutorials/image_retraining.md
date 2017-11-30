@@ -406,20 +406,28 @@ effect.
 所以想每批使用更多的图片而整体效果不变，你需要减小学习速率。
 
 ## Training, Validation, and Testing Sets
-
+## 训练、验证和测试集
 One of the things the script does under the hood when you point it at a folder
 of images is divide them up into three different sets. The largest is usually
 the training set, which are all the images fed into the network during training,
-with the results used to update the model's weights. You might wonder why we
+with the results used to update the model's weights.
+当你把脚本指向一个图片文件夹时所做的其中一件事是把他们划分成三个不同的集合。通常最大的集合为训练集，
+这里的全部图片都用与训练的输入，并用图片的结果来不断调整模型的权重。
+You might wonder why we
 don't use all the images for training? A big potential problem when we're doing
 machine learning is that our model may just be memorizing irrelevant details of
-the training images to come up with the right answers. For example, you could
+the training images to come up with the right answers.
+你可能会有疑问，为什么不把所有的图片都用来训练。当我们做机器学习时的一个很大的潜在问题是
+模型可能会通过记住大量的不相关的细节来得出正确的答案。
+For example, you could
 imagine a network remembering a pattern in the background of each photo it was
 shown, and using that to match labels with objects. It could produce good
 results on all the images it's seen before during training, but then fail on new
 images because it's not learned general characteristics of the objects, just
 memorized unimportant details of the training images.
-
+例如，你能想象一个网络记住了展示给它的每一张相片的背景的模式，并使用它在物体和标签之间做匹配。他可能
+会在之前训练过程中见到过的图片上做出很好的预测，但是却会在新的图片上失败，因为它没有学会物体的通用特征，
+只是记住了训练图片上的一些不重要的细节。
 This problem is known as overfitting, and to avoid it we keep some of our data
 out of the training process, so that the model can't memorize them. We then use
 those images as a check to make sure that overfitting isn't occurring, since if
@@ -431,20 +439,26 @@ of the classifier. These ratios can be controlled using the
 `--testing_percentage` and `--validation_percentage` flags. In general
 you should be able to leave these values at their defaults, since you won't
 usually find any advantage to training to adjusting them.
-
+这个问题就是人们常说的过拟合，要避免这个问题就要让一部分数据不参与训练过程，以防模型会记住它们。
+我们可以把不参与训练过程的那些数据作为模型是否过拟合的检验，如果模型在这些数据上有很好的准确性，
+说明模型没有过拟合。通常将全部数据的 80% 作为主要的训练集，另外 10% 作为训练过程中的验证也会经常使用，
+剩下的 10% 作为预测分类器在真实世界中的表现的测试数据集，不经常使用。划分的比例可以通过 `--testing_percentage` 
+和 `--validation_percentage` 进行控制。一般情况下使用默认值就可以了，通常情况下
+你不会因为调整它们而获得任何训练的优势。
 Note that the script uses the image filenames (rather than a completely random
 function) to divide the images among the training, validation, and test sets.
 This is done to ensure that images don't get moved between training and testing
 sets on different runs, since that could be a problem if images that had been
 used for training a model were subsequently used in a validation set.
-
+注意脚本通过文件名（而不是随机函数）对训练、验证和测试集中的图片进行区分。这么做是为了确保图片不会
+在不同的运行期内在训练和测试集之间移动，因为如果用于训练的图片在随后又被用于验证，这会是一个问题。
 You might notice that the validation accuracy fluctuates among iterations. Much
 of this fluctuation arises from the fact that a random subset of the validation
 set is chosen for each validation accuracy measurement. The fluctuations can be
 greatly reduced, at the cost of some increase in training time, by choosing
 `--validation_batch_size=-1`, which uses the entire validation set for each
 accuracy computation.
-
+你可能注意到验证的准确性
 Once training is complete, you may find it insightful to examine misclassified
 images in the test set. This can be done by adding the flag
 `--print_misclassified_test_images`. This may help you get a feeling for which
