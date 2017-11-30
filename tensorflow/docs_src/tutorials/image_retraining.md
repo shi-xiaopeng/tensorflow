@@ -458,7 +458,9 @@ set is chosen for each validation accuracy measurement. The fluctuations can be
 greatly reduced, at the cost of some increase in training time, by choosing
 `--validation_batch_size=-1`, which uses the entire validation set for each
 accuracy computation.
-你可能注意到验证的准确性
+你可能注意到验证的准确性在迭代中有波动。大部分的波动源于这样一个事实，每一次验证的准确率是由一个随机的验证子集来衡量的。
+这种波动能被极大的减小，付出的代价是更多的训练时间，通过指定 `--validation_batch_size=-1`
+可以使每一次准确率计算都使用全部的验证集。
 Once training is complete, you may find it insightful to examine misclassified
 images in the test set. This can be done by adding the flag
 `--print_misclassified_test_images`. This may help you get a feeling for which
@@ -471,7 +473,11 @@ errors in the input data set, such as mislabeled, low-quality, or ambiguous
 images. However, one should generally avoid point-fixing individual errors in
 the test set, since they are likely to merely reflect more general problems in
 the (much larger) training set.
-
+训练一旦完成，你会发现检查测试集中被错误分类的图片是一件极具洞察的事。可以通过添加 `--print_misclassified_test_images` 
+查看这些图片。这可以帮助你获得关于哪种类型的图片对你的模型最有迷惑性，哪种分类最难以辨别的感性认识。
+例如，你可能发现一些特定类别的子分类或者某些刁钻的拍摄角度特别难以识别，这可能激发你添加更多的那种子类的训练图片。
+通常，检查错误分类的图片同样能指出输入数据中的一些错误，如标签错误、图片质量低、或者模棱两可的图片。
+然而，通常应该避免对测试集进行针对性修复单个错误，因为这些错误很可能只是对训练集（数据量更大）中存在的更一般问题的一种反映。
 ## Other Model Architectures
 
 By default the script uses a pretrained version of the Inception v3 model
