@@ -479,7 +479,7 @@ the (much larger) training set.
 通常，检查错误分类的图片同样能指出输入数据中的一些错误，如标签错误、图片质量低、或者模棱两可的图片。
 然而，通常应该避免对测试集进行针对性修复单个错误，因为这些错误很可能只是对训练集（数据量更大）中存在的更一般问题的一种反映。
 ## Other Model Architectures
-
+## 其他模型结构
 By default the script uses a pretrained version of the Inception v3 model
 architecture. This is a good place to start because it provides high accuracy
 results, but if you intend to deploy your model on mobile devices or other
@@ -487,11 +487,17 @@ resource-constrained environments you may want to trade off a little accuracy
 for much smaller file sizes or faster speeds. To help with that, the
 [retrain.py script](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/image_retraining/retrain.py)
 supports 32 different variations on the [Mobilenet architecture](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html).
-
+脚本默认使用 Inception v3 模型架构的预训练版本。这是一个很好的开始因为它提供的结果有很高的精确性，但是如果
+你要把你的模型部署到移动设备或者资源有限的环境中时，你可能需要牺牲一点准确性以获得更小的文件体积或者更快的速度。
+为了能帮助做到这些，这个[retrain.py script](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/image_retraining/retrain.py)
+支持 32 中不同的[移动架构](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html)衍生版本
 These are a little less precise than Inception v3, but can result in far
 smaller file sizes (down to less than a megabyte) and can be many times faster
 to run. To train with one of these models, pass in the `--architecture` flag,
 for example:
+
+相比 Inception v3 这些衍生版本精确度要差一些，但是文件体积也小得多（小于 1 M 字节）而且运行速度要快上许多倍。
+要使用这些模型进行训练，使用 `--architecture` 标记，例如：
 
 ```
 python tensorflow/examples/image_retraining/retrain.py \
@@ -507,13 +513,24 @@ image size, with smaller sizes giving faster speeds, and an optional
 '_quantized' at the end to indicate whether the file should contain 8-bit or
 32-bit float weights.
 
+它会在 `/tmp/output_graph.pb` 下创建一个 941KB 大小的模型文件，拥有完整 Mobilenet 参数的
+25%，接受大小为 128x128 的图像文件作为输入，而且使用 8 个比特位表示权重。你可以使用 ‘1.0’，‘0.75’，
+‘0.50’ 或者 ‘0.25’ 来控制权重参数的数量，还可以使用 ‘224’，‘192’，‘160’ 或者 ‘128’来
+控制输入图像文件的大小（某种程度上也是在控制速度），输入的体积越小训练速度也就越快，最后还有一个可选的
+`_quantized` 表示文件是否应该包含 8 位或 32 位浮点权重值。
+
 The speed and size advantages come at a loss to accuracy of course, but for many
 purposes this isn't critical. They can also be somewhat offset with improved
 training data. For example, training with distortions allows me to get above 80%
 accuracy on the flower data set even with the 0.25/128/quantized graph above.
-
+速度和体积的优势当然会带来损失准确性，但是对于许多应用来说这并不是最关键的。损失的准确性可以通过
+改善训练数据得到一些补偿。例如，使用变形图片让我在即使使用 0.25/128/quantized 的
+输入图片配置时依然可以得到超过 80% 的准确性。
 If you're going to be using the Mobilenet models in label_image or your own
 programs, you'll need to feed in an image of the specified size converted to a
 float range into the 'input' tensor. Typically 24-bit images are in the range
 [0,255], and you must convert them to the [-1,1] float range expected by the
-model with the formula  `(image - 128.)/128.`.
+model with the formula  `(image - 128.)/128.`.
+如果你要在标签图片或者你自己的程序中使用 Mobilenet 模型，你需要输入被转换成一个浮动的区间的特定大小的图片到
+`input` 张量中。典型的 24 位图片的范围是 [0, 255]，你必须把他们通过公式 `(image - 128.)/128.` 转换到模型期望的 [-1, 1] 浮动区间内。
+
