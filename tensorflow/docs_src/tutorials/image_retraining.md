@@ -8,10 +8,10 @@ retraining the final layer from scratch, while leaving all the others untouched.
 For more information on the approach you can see
 [this paper on Decaf](https://arxiv.org/pdf/1310.1531v1.pdf).
 
-当前的对象识别模型拥有数十万计的参数，花费数周的时间来整个训练。迁移学习是一种技术，这种技术能够大幅缩短这一过程，
-通过将一个已经完整训练过的模型如 ImageNet 重新训练来获得新的分类。在本例中我们将重新训练一个模型的最后一层，
-保留所有其他的不变。
-获得此方法的更多信息请参考[ Decaf 的这篇论文](https://arxiv.org/pdf/1310.1531v1.pdf).
+当前的对象识别模型拥有数十万计的参数，花费数周的时间来整个训练。迁移学习是一种能够大幅缩短这一过程的一种技术，
+它通过将一个已经完整训练过的模型如 ImageNet 重新训练来识别新的分类。
+在本例中我们将从零开始训练模型的最后一层并保留其他部分不变。
+想要获得此方法的更多信息请参考[ Decaf 的这篇论文](https://arxiv.org/pdf/1310.1531v1.pdf).
 
 Though it's not as good as a full training run, this is surprisingly effective
 for many applications, and can be run in as little as thirty minutes on a
@@ -19,14 +19,14 @@ laptop, without requiring a GPU. This tutorial will show you how to run the
 example script on your own images, and will explain some of the options you have
 to help control the training process.
 
-尽管这总方式的效果没有完整训练的好，这种方法对很多应用惊人的有效，而且能在一个没有 GPU 的笔记本上 30 分钟内完成训练。
-这篇教程将展示如何在你自己的图片上执行示例脚本，而且会讲解一些你将会用到的，用于控制训练过程的一些选项。
+尽管这种方式的效果没有比不上完整的训练，这种方法却对很多应用惊人的有效，而且能在笔记本上不要求 GPU的情况下 30 分钟内完成训练。
+这篇教程将展示如何在你自己的图片库上执行示例脚本，而且会讲解一些你将会用到的，帮助控制训练过程的一些选项。
 
 Note: This version of the tutorial mainly uses bazel. A bazel free version is
 also available
 [as a codelab](https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/#0).
 
-注：此版本的教程主要使用 bazel。下面给出一个 bazel 的免费版本作为一个【代码库】
+注：此版本的教程主要使用 Bazel 构建工具。下面给出一个 codelab 上的一个免费版本
 (https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/#0).
 
 [TOC]
@@ -46,10 +46,10 @@ explains how to prepare your own images, but to make it easy we've created an
 archive of creative-commons licensed flower photos to use initially. To get the
 set of flower photos, run these commands:
 
-在开始任何训练之前，你需要一组图片，用于教网络认识你想让网络识别的那个新分类。
-具体如何准备你自己的图片库我们将在后面的部分讲解，为了使讲解更容易我们创建了一个
+在开始任何的训练之前，你需要一组图片，用于教网络认识你想让网络识别的那些新分类。
+具体如何准备你自己的图片库我们将在后面的部分讲解，为了便于讲解我们创建了一个
 包含知识共享授权花的图片的文件夹用于我们的初始化。
-获取这些花朵图片，可以执行以下命令：
+获取这些花朵图片，可以执行下面的命令：
 
 ```sh
 cd ~
@@ -60,7 +60,7 @@ tar xzf flower_photos.tgz
 Once you have the images, you can build the retrainer like this, from the root
 of your TensorFlow source directory:
 
-获得这些图片后，你可以再你的 TensorFlow 源码文件的根目录下创建一个 retrainer :
+获得这些图片后，你可以在你的 TensorFlow 源码文件的根目录下构建这个再训练器 :
 
 ```sh
 bazel build tensorflow/examples/image_retraining:retrain
@@ -72,15 +72,14 @@ If you have a machine which supports
 speed of the retraining by building for that architecture, like this (after choosing appropriate options in `configure`):
 
 如果你有一个支持[AVX 指令集](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions)(常见于最近几年中生产的 x86 CPU 中)
-你可以通过构建那种结构来提升再训练的运行速度，构建方式如下（在 `configure` 中选择合适的选项之后）:
+的机器，你可以通过构建能充分利用那种架构优点的体系结构来提升再训练的执行速度，构建方式如下（在 `configure` 中选择合适的选项之后）:
 
 ```sh
 bazel build --config opt tensorflow/examples/image_retraining:retrain
 ```
 
 The retrainer can then be run like this:
-
-再训练器通过如下方式执行：
+之后再训练器可以按照如下方式运行：
 
 ```sh
 bazel-bin/tensorflow/examples/image_retraining/retrain --image_dir ~/flower_photos
