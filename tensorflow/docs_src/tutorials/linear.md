@@ -8,15 +8,17 @@ those tools. It explains:
 tf.estimator 的 API (和其他工具一起）已经为在 TensorFlow 中使用线性模型提供了一系列丰富的工具。
 这个文档将对这些工具做一个概览。 它包括：
 
-   * what a linear model is. 
-   * why you might want to use a linear model. 
-   * how tf.estimator makes it easy to build linear models in TensorFlow.
+  
+   * what a linear model is.
+   * why you might want to use a linear model.
+   * how tf.estimator makes it easy to build linear models in TensorFlow.
    * how you can use tf.estimator to combine linear models with
    deep learning to get the advantages of both.
+
    * 线性模型是什么。
    * 为什么要使用线性模型。
-   * tf.estimator 是如何使线性模型的构建更简单的。
-   * 怎样使用 tf.estimator 融合线性模型和深度学习更好的发挥两者的优势
+   * tf.estimator 是如何使线性模型的构建更简单的。
+   * 怎样使用 tf.estimator 融合线性模型和深度学习更好的发挥两者的优势
    
 Read this overview to decide whether the tf.estimator linear model tools might
 be useful to you. Then do the @{$wide$Linear Models tutorial} to
@@ -34,6 +36,7 @@ with basic machine learning concepts, and also with @{$estimator$tf.estimator}.
 [TOC]
 
 ## What is a linear model?
+## 线性模型是什么？
 
 A *linear model* uses a single weighted sum of features to make a prediction.
 For example, if you have [data](https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.names)
@@ -42,17 +45,28 @@ work for a population, you can learn weights for each of those numbers so that
 their weighted sum estimates a person's salary. You can also use linear models
 for classification.
 
+*线性模型*使用单一变量对所有的特征做出预测。例如，如果你有有关年龄的数据，受教育年限，每周的工作时长，
+你可以从这些数据中学习到权重值，使得这个权重乘以总值可以预测出一个人的薪水。你同样可以用线性模型来做分类。
+
 Some linear models transform the weighted sum into a more convenient form. For
 example, *logistic regression* plugs the weighted sum into the logistic
 function to turn the output into a value between 0 and 1. But you still just
 have one weight for each input feature.
 
+一些线性模型把这个加权和转换成为一种更简便的形式。例如，逻辑回归将加权和导入一个逻辑函数中，
+获得一个在 0 和 1 之间的输出。但是对于每次输入的特征依然只有一个权重值。
+
 ## Why would you want to use a linear model?
+
+## 为什么要使用线性模型
 
 Why would you want to use so simple a model when recent research has
 demonstrated the power of more complex neural networks with many layers?
 
+在当前研究显示出更复杂的多层神经网络的威力的情况下，我们为什么还有使用如此简单的线性模型呢？
+
 Linear models:
+线性模型：
 
    * train quickly, compared to deep neural nets.
    * can work well on very large feature sets.
@@ -64,22 +78,42 @@ Linear models:
    * provide an excellent starting point for learning about machine learning.
    * are widely used in industry.
 
+   * 相对于深度神经网络，线性模型的训练速度更快。
+   * 在非常巨大的特征集上依然有效。
+   * 能够使用不需要很多无用的学习率的算法进行训练。
+   * 比神经网络更容易理解和调试。你可以查看分配给每一个特征的权重值来搞清楚什么会对预测产生最大的影响。
+   * 是学习机器学习的一个绝佳的起始点。
+   * 在工业中普遍使用。
+
 ## How does tf.estimator help you build linear models?
+
+## tf.estimator 是如何帮助你构建线性模型的？
 
 You can build a linear model from scratch in TensorFlow without the help of a
 special API. But tf.estimator provides some tools that make it easier to build
 effective large-scale linear models.
 
+在 TensorFlow 中你可以不借助于任何特殊的 API 来从头创建一个线性模型。但是 tf.estimator
+提供了一些工具使构建有效的大规模线性模型更容易。
+
 ### Feature columns and transformations
+
+### 特征列和转换
 
 Much of the work of designing a linear model consists of transforming raw data
 into suitable input features. Tensorflow uses the `FeatureColumn` abstraction to
 enable these transformations.
 
+设计一个线性模型的大部分工作集中在把原始数据转换成合适的输入特征。TensorFlow 使用
+`特征列` 的抽象方式使这些转换成为可能。
+
 A `FeatureColumn` represents a single feature in your data. A `FeatureColumn`
 may represent a quantity like 'height', or it may represent a category like
 'eye_color' where the value is drawn from a set of discrete possibilities like
 {'blue', 'brown', 'green'}.
+
+一个 `特征列` 表示你的数据中的一个单一特征。一个 `特征列` 可能表示一个数量，如高度；
+也可能代表一中分类，如眼睛的颜色，眼睛的颜色可能是一系列可能的颜色如 {'蓝', '棕', '绿'}。
 
 In the case of both *continuous features* like 'height' and *categorical
 features* like 'eye_color', a single value in the data might get transformed
@@ -89,7 +123,13 @@ semantic unit in spite of this fact. You can specify transformations and
 select features to include without dealing with specific indices in the
 tensors you feed into the model.
 
+不管是连续性特征（如身高）还是类别性特征（如眼睛颜色），数据中的一个单一值在输入模型之前
+都可能会被转换成一个数值序列。抽象的 `特征列` 使你能像操作单个语义单元一样对特征进行操作。
+你可以指定进行那种转换，选择要加入的特征而不用担心模型输入张量的特定索引。
+
 #### Sparse columns
+
+### 稀疏列
 
 Categorical features in linear models are typically translated into a sparse
 vector in which each possible value has a corresponding index or id. For
@@ -99,10 +139,20 @@ become [0, 1, 0] and 'green' would become [0, 0, 1]. These vectors are called
 "sparse" because they may be very long, with many zeros, when the set of
 possible values is very large (such as all English words).
 
+线性模型中的分类特征通常会被转换到一个稀疏向量中，向量中的每个可能值都有相应的 id 或索引。
+例如，如果只有三种可能的眼睛颜色，你可以使用一个长度为 3 的向量来表示：[1, 0, 0] 表示 '棕'，
+[0, 1, 0] 表示 '蓝'，[0, 0, 1] 表示 '绿'。这些向量之所以叫 '稀疏' 是因为当可能的
+取值非常大的时候（例如所有的英文单词），向量就会就会非常长而且会有很多 0.
+
 While you don't need to use categorical columns to use tf.estimator linear
 models, one of the strengths of linear models is their ability to deal with
 large sparse vectors. Sparse features are a primary use case for the
 tf.estimator linear model tools.
+
+当你使用 tf.estimator 的线性模型时，就不在需要用分类列了。线性模型的优点之一就是他们
+处理大型稀疏向量的能力。稀疏特征是 tf.estimator 线性特征模型工具的一个主要使用场景。
+
+------------------ reached your goal today ------------------------------
 
 ##### Encoding sparse columns
 
