@@ -1,22 +1,35 @@
 # Large-scale Linear Models with TensorFlow
+# TensorFlow 的大规模线性模型
 
 The tf.estimator API provides (among other things) a rich set of tools for
 working with linear models in TensorFlow. This document provides an overview of
 those tools. It explains:
 
-   * what a linear model is.
-   * why you might want to use a linear model.
-   * how tf.estimator makes it easy to build linear models in TensorFlow.
+tf.estimator 的 API (和其他工具一起）已经为在 TensorFlow 中使用线性模型提供了一系列丰富的工具。
+这个文档将对这些工具做一个概览。 它包括：
+
+   * what a linear model is. 
+   * why you might want to use a linear model. 
+   * how tf.estimator makes it easy to build linear models in TensorFlow.
    * how you can use tf.estimator to combine linear models with
    deep learning to get the advantages of both.
-
+   * 线性模型是什么。
+   * 为什么要使用线性模型。
+   * tf.estimator 是如何使线性模型的构建更简单的。
+   * 怎样使用 tf.estimator 融合线性模型和深度学习更好的发挥两者的优势
+   
 Read this overview to decide whether the tf.estimator linear model tools might
 be useful to you. Then do the @{$wide$Linear Models tutorial} to
 give it a try. This overview uses code samples from the tutorial, but the
 tutorial walks through the code in greater detail.
 
+你可以通过这个概览知道 tf.estimator 的线性模型工具是否对你有帮助。而后你可以再 @{$wide$线性模型教程}
+中尝试一下。这个概览的代码用例来自于教程，但是教程会对代码有更详细的说明。
+
 To understand this overview it will help to have some familiarity
 with basic machine learning concepts, and also with @{$estimator$tf.estimator}.
+
+为了更好的理解这个概览，你应该首先对机器学习的基本概念和 @{$estimator$tf.estimator} 有所了解。
 
 [TOC]
 
