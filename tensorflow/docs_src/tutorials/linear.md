@@ -155,9 +155,12 @@ tf.estimator linear model tools.
 ------------------ reached your goal today ------------------------------
 
 ##### Encoding sparse columns
+##### 编码稀疏列
 
 `FeatureColumn` handles the conversion of categorical values into vectors
 automatically, with code like this:
+
+ `特征列` 会自动处理分类值到向量的转换过程，使用一下的代码：
 
 ```python
 eye_color = tf.feature_column.categorical_column_with_vocabulary_list(
@@ -165,11 +168,15 @@ eye_color = tf.feature_column.categorical_column_with_vocabulary_list(
 ```
 
 where `eye_color` is the name of a column in your source data.
+这里的 `eye_color` 就是你的原始数据中列的名字。
 
 You can also generate `FeatureColumn`s for categorical features for which you
 don't know all possible values. For this case you would use
 `categorical_column_with_hash_bucket()`, which uses a hash function to assign
 indices to feature values.
+
+你同样可以为你不知道所有的肯能取值的分类特征生成 `特征列`。这种情况下你应该使用
+`categorical_column_with_hash_bucket()`，这个方法会使用哈希函数为特征值建立索引。
 
 ```python
 education = tf.feature_column.categorical_column_with_hash_bucket(
@@ -177,6 +184,7 @@ education = tf.feature_column.categorical_column_with_hash_bucket(
 ```
 
 ##### Feature Crosses
+##### 交叉特征
 
 Because linear models assign independent weights to separate features, they
 can't learn the relative importance of specific combinations of feature
@@ -185,13 +193,22 @@ you're trying to predict whether a person likes to wear red, your linear model
 won't be able to learn that baseball fans from St. Louis especially like to
 wear red.
 
+由于线性模型会为不同的特征分配单独的权重，线性模型无法学习特定的特征组合的相对重要性。
+如果你有 "最喜欢的运动" 和 "家乡城市" 这两个特征，然后尝试预测是否一个人喜欢穿红色，你的
+线性模型时没有办法学到来自圣路易斯的棒球迷特别喜欢穿红色的。
+
 You can get around this limitation by creating a new feature
 'favorite_sport_x_home_city'. The value of this feature for a given person is
 just the concatenation of the values of the two source features:
 'baseball_x_stlouis', for example. This sort of combination feature is called
 a *feature cross*.
 
+你可以通过创建一个表示 "最喜欢的运动-家乡城市" 的新特征来绕开这个限制。对于给定的一个人
+这个特征的值正好是那两个源特征的值的连接：例如，"棒球-圣路易斯"。这种结合特征被叫做
+"交叉特征"。
+
 The `crossed_column()` method makes it easy to set up feature crosses:
+`crossed_column()` 方法使设置交叉特征很容易：
 
 ```python
 sport_x_city = tf.feature_column.crossed_column(
@@ -199,8 +216,10 @@ sport_x_city = tf.feature_column.crossed_column(
 ```
 
 #### Continuous columns
+#### 连续性列
 
 You can specify a continuous feature like so:
+你能像下面这样指定一个连续性特征：
 
 ```python
 age = tf.feature_column.numeric_column("age")
@@ -209,15 +228,24 @@ age = tf.feature_column.numeric_column("age")
 Although, as a single real number, a continuous feature can often be input
 directly into the model, Tensorflow offers useful transformations for this sort
 of column as well.
+尽管作为一个单一的实数，通常情况下连续性特征能直接被输入模型中，TensorFlow 同样为
+这种特征列提供了很有用的转换方式。
+
 
 ##### Bucketization
+##### 离散化
 
 *Bucketization* turns a continuous column into a categorical column. This
 transformation lets you use continuous features in feature crosses, or learn
 cases where specific value ranges have particular importance.
 
+*离散化* 能把连续性列转换成分类性列。这种转换使你能在交叉特征中使用连续性列，或者从
+特定的区间有特定的权重的特征列中学习
+
 Bucketization divides the range of possible values into subranges called
 buckets:
+
+离散化把可能值的区间划分成一个个小区间，这些小的区间就叫作 ucket 。
 
 ```python
 age_buckets = tf.feature_column.bucketized_column(
@@ -226,6 +254,11 @@ age_buckets = tf.feature_column.bucketized_column(
 
 The bucket into which a value falls becomes the categorical label for
 that value.
+
+一个值所落入的 bucket 就成为这个值得分类标签。
+
+
+---------------- Tuesday Task Line ----------------------------------
 
 #### Input function
 
