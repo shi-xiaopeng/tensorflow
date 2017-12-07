@@ -152,7 +152,6 @@ tf.estimator linear model tools.
 当你使用 tf.estimator 的线性模型时，就不在需要用分类列了。线性模型的优点之一就是他们
 处理大型稀疏向量的能力。稀疏特征是 tf.estimator 线性特征模型工具的一个主要使用场景。
 
------------------- reached your goal today ------------------------------
 
 ##### Encoding sparse columns
 ##### 编码稀疏列
@@ -258,13 +257,15 @@ that value.
 一个值所落入的 bucket 就成为这个值得分类标签。
 
 
----------------- Tuesday Task Line ----------------------------------
-
 #### Input function
+#### 输入函数
 
 `FeatureColumn`s provide a specification for the input data for your model,
 indicating how to represent and transform the data. But they do not provide
 the data itself. You provide the data through an input function.
+
+`特征列` 为模型提供了一种输入数据规格，指明如何表示和转换数据。但是它们本身不是数据。
+你需要通过一个输入函数提供数据。
 
 The input function must return a dictionary of tensors. Each key corresponds to
 the name of a `FeatureColumn`. Each key's value is a tensor containing the
@@ -274,29 +275,48 @@ more comprehensive look at input functions, and `input_fn` in the
 [linear models tutorial code](https://www.tensorflow.org/code/tensorflow/examples/learn/wide_n_deep_tutorial.py)
 for an example implementation of an input function.
 
+这个输入函数必须返还一个张量字典。其中的每一个键对应 `特征列` 的名字，键所对应的值是一个张量，
+包含所有数据实例的该特征的值。想要更多的了解输入函数请看@{$input_fn$使用 tf.estimator 构建输入函数}，
+一个输入函数的实现例子请见：
+[线性模型教程代码](https://www.tensorflow.org/code/tensorflow/examples/learn/wide_n_deep_tutorial.py)
+
 The input function is passed to the `train()` and `evaluate()` calls that
 initiate training and testing, as described in the next section.
 
+输入函数在调用 `train()` 和 `evaluate()` 初始化训练和测试时被传进来，将在下一部分说明。
+
 ### Linear estimators
+### 线性估算器
 
 Tensorflow estimator classes provide a unified training and evaluation harness
 for regression and classification models. They take care of the details of the
 training and evaluation loops and allow the user to focus on model inputs and
 architecture.
 
+Tensorflow 估算器类为回归和分类模型提供一套统一的训练和评估框架。它们会处理好
+训练和评估循环过程中的细节，让用户专注于模型的输入和结构。
+
 To build a linear estimator, you can use either the
 `tf.estimator.LinearClassifier` estimator or the
 `tf.estimator.LinearRegressor` estimator, for classification and
 regression respectively.
+你可以使用 `tf.estimator.LinearClassifier` `tf.estimator.LinearRegressor`
+来创建估算器分别用于分类和回归。
 
 As with all tensorflow estimators, to run the estimator you just:
+对于所有的 tensorflow 估算器，运行它只需要：
 
    1. Instantiate the estimator class. For the two linear estimator classes,
    you pass a list of `FeatureColumn`s to the constructor.
    2. Call the estimator's `train()` method to train it.
    3. Call the estimator's `evaluate()` method to see how it does.
 
+   1. 初始化估算器。对于线性估算器类，你为构造器传入一个`特征列`列表。
+   2. 调用估算器的 `train()` 方法训练它。
+   3. 调用估算器的 `evaluate()` 方法查看训练的效果。
+
 For example:
+例如：
 
 ```python
 e = tf.estimator.LinearClassifier(
@@ -307,20 +327,26 @@ e = tf.estimator.LinearClassifier(
     model_dir=YOUR_MODEL_DIRECTORY)
 e.train(input_fn=input_fn_train, steps=200)
 # Evaluate for one step (one pass through the test data).
+# 对训练进行评估（通过测试数据）
 results = e.evaluate(input_fn=input_fn_test)
 
 # Print the stats for the evaluation.
+# 打印评估的结果数据
 for key in sorted(results):
     print("%s: %s" % (key, results[key]))
 ```
 
 ### Wide and deep learning
-
+### 宽深学习
 The tf.estimator API also provides an estimator class that lets you jointly
 train a linear model and a deep neural network. This novel approach combines the
 ability of linear models to "memorize" key features with the generalization
 ability of neural nets. Use `tf.estimator.DNNLinearCombinedClassifier` to
 create this sort of "wide and deep" model:
+
+tf.estimator API 同样提供了一个估算器类能让你同时训练一个线性模型和一个深度神经网络。
+这个新颖的方法结合了线性模型对关键特征的记忆和神经网络的通用性能力。可以使用
+`tf.estimator.DNNLinearCombinedClassifier` 创建这种宽深模型
 
 ```python
 e = tf.estimator.DNNLinearCombinedClassifier(
@@ -330,3 +356,4 @@ e = tf.estimator.DNNLinearCombinedClassifier(
     dnn_hidden_units=[100, 50])
 ```
 For more information, see the @{$wide_and_deep$Wide and Deep Learning tutorial}.
+更多信息，请见 @{$wide_and_deep$宽深学习教程}.
