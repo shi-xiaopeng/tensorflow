@@ -1,4 +1,5 @@
 # Improving Linear Models Using Explicit Kernel Methods
+# 使用特定的内核方法改善线性模型
 
 In this tutorial, we demonstrate how combining (explicit) kernel methods with
 linear models can drastically increase the latters' quality of predictions
@@ -6,6 +7,9 @@ without significantly increasing training and inference times. Unlike dual
 kernel methods, explicit (primal) kernel methods scale well with the size of the
 training dataset both in terms of training/inference times and in terms of
 memory requirements.
+
+在这篇教程里，我们将示范如何使用特定的内核方法在不大幅增加和推理时间的情况下大幅提升线性模型的
+预测质量。
 
 **Intended audience:** Even though we provide a high-level overview of concepts
 related to explicit kernel methods, this tutorial primarily targets readers who
