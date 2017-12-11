@@ -9,7 +9,8 @@ training dataset both in terms of training/inference times and in terms of
 memory requirements.
 
 在这篇教程里，我们将示范如何使用特定的内核方法在不大幅增加和推理时间的情况下大幅提升线性模型的
-预测质量。
+预测质量。与多内核方法不同，特定核心方法对训练数据集的大小具有很好的可扩展性，不管是在训练和推理时间上
+还是在内存占用上。
 
 **Intended audience:** Even though we provide a high-level overview of concepts
 related to explicit kernel methods, this tutorial primarily targets readers who
@@ -17,12 +18,21 @@ already have at least basic knowledge of kernel methods and Support Vector
 Machines (SVMs). If you are new to kernel methods, refer to either of the
 following sources for an introduction:
 
+**主要读者：** 尽管我们提供一个特定核心方法相关概念的高层概览，这个教程的主要目标读者至少
+要了解内核方法和支持向量机的基础知识，可以参考以下的资源做一个了解：
+
 * If you have a strong mathematical background:
 [Kernel Methods in Machine Learning](https://arxiv.org/pdf/math/0701907.pdf)
 * [Kernel method wikipedia page](https://en.wikipedia.org/wiki/Kernel_method)
 
+* 如果你有很强的数学背景：
+[机器学习中的内核方法](https://arxiv.org/pdf/math/0701907.pdf)
+* [内核方法维基百科](https://en.wikipedia.org/wiki/Kernel_method)
+
 Currently, TensorFlow supports explicit kernel mappings for dense features only;
 TensorFlow will provide support for sparse features at a later release.
+
+目前，TensorFlow 只支持对于密集特征的特定特定方法映射。对于稀疏特征的支持将在后面的发布版本中提供。
 
 This tutorial uses [tf.contrib.learn](https://www.tensorflow.org/code/tensorflow/contrib/learn/python/learn)
 (TensorFlow's high-level Machine Learning API) Estimators for our ML models.
@@ -30,13 +40,25 @@ If you are not familiar with this API, [tf.estimator Quickstart](https://www.ten
 is a good place to start. We will use the MNIST dataset. The tutorial consists
 of the following steps:
 
+本教程使用 [tf.contrib.learn](https://www.tensorflow.org/code/tensorflow/contrib/learn/python/learn)
+（TensorFlow 高级机器学习接口）估测器作为我们的机器学习模型。如果你对这份 API 不熟悉，可以参考
+[tf.estimator Quickstart](https://www.tensorflow.org/get_started/estimator)。
+我们将使用 MNIST 教程中提到数据集。本教程包含以下步骤：
+
 * Load and prepare MNIST data for classification.
 * Construct a simple linear model, train it, and evaluate it on the eval data.
 * Replace the linear model with a kernelized linear model, re-train, and
 re-evaluate.
 
+* 为分类下载和准备 MNIST 数据。
+* 构建一个简单的线性模型，训练并在评估数据上评估。
+* 用内核化的线性模型替换线性模型，再次训练，评估。
+
 ## Load and prepare MNIST data for classification
+## 为分类任务下载和准备 MNIST 数据
+
 Run the following utility command to load the MNIST dataset:
+运行如下的工具命令来下载 MNIST 数据集：
 
 ```python
 data = tf.contrib.learn.datasets.mnist.load_mnist()
@@ -47,6 +69,10 @@ respectively. Each split contains one numpy array for images (with shape
 [sample_size, 784]) and one for labels (with shape [sample_size, 1]). In this
 tutorial, we only use the train and validation splits to train and evaluate our
 models respectively.
+
+上面的方法下载了 MNIST 全部数据集（包含 70K 的样本），并分成大小分别为 55K, 5K 和 10K 的
+训练，验证和测试集。每次分割包含一个 numpy 图像数组（shape 为 [样本大小, 784]）和一个
+numpy 标签数组（shape 为 [样本大小, 1])。在本教程中，我们只是用训练和验证集来分别训练和验证我们的模型。
 
 In order to feed data to a tf.contrib.learn Estimator, it is helpful to convert
 it to Tensors. For this, we will use an `input function` which adds Ops to the
@@ -60,6 +86,15 @@ typically expedites convergence during training). The full code for loading and
 preparing the data is shown in the snippet below. In this example, we use
 mini-batches of size 256 for training and the entire sample (5K entries) for
 evaluation. Feel free to experiment with different batch sizes.
+
+给 tf.contrib.learn 估测器输入数据，把数据转换成张量会更方便。为了做到这一点，我们是用一个
+`input function` 的方法，它会给 TensorFlow 计算图添加选项，执行时会创建下游使用的小批次张量。
+更多关于 `input function` 的背景消息请参考@{$get_started/input_fn$Building Input Functions with tf.contrib.learn}.
+在这个例子中，我们将使用 `tf.train.shuffle_batch` 选项，这个选项除了可以将 numpy
+数组转换张量之外，还允许我们指定每次 input_fn 选项运行时批次的大小和是否将输入随机化
+(随机化通常会加快训练过程中的收敛)。下载和准备数据的完整代码加载下面的片段里。
+本例中，我们训练使用最小的批次大小 256，评估使用整个的评估样本（5K）。你可以使用其他的
+批次大小进行试验。
 
 ```python
 import numpy as np
@@ -88,10 +123,15 @@ eval_input_fn = get_input_fn(data.validation, batch_size=5000)
 ```
 
 ## Training a simple linear model
+## 训练一个简单的线性模型
+
 We can now train a linear model over the MNIST dataset. We will use the
 @{tf.contrib.learn.LinearClassifier} estimator with 10 classes representing the
 10 digits. The input features form a 784-dimensional dense vector which can
 be specified as follows:
+
+现在我们可以使用 MNIST 数据集训练一个线性模型。我们将使用 @{tf.contrib.learn.LinearClassifier}
+带有 10 个分类估测器代表 10 个数字。输入特征组成一个 784 维的密集向量，可以通过如下方式指定：
 
 ```python
 image_column = tf.contrib.layers.real_valued_column('images', dimension=784)
@@ -99,6 +139,8 @@ image_column = tf.contrib.layers.real_valued_column('images', dimension=784)
 
 The full code for constructing, training and evaluating a LinearClassifier
 estimator is as follows:
+
+构建、训练和评估一个线性分类器估测器的完整代码如下：
 
 ```python
 import time
@@ -145,6 +187,8 @@ estimator = tf.contrib.learn.LinearClassifier(
 
 Regardless of the values of the parameters, the maximum accuracy a linear model
 can achieve on this dataset caps at around **93%**.
+
+---------------- today line --------------------
 
 ## Using explicit kernel mappings with the linear model.
 The relatively high error (~7%) of the linear model over MNIST indicates that
