@@ -201,14 +201,23 @@ can achieve on this dataset caps at around **93%**.
 ---------------- today line --------------------
 
 ## Using explicit kernel mappings with the linear model.
+## 使用特定的内核与线性模型相对应
+
 The relatively high error (~7%) of the linear model over MNIST indicates that
 the input data is not linearly separable. We will use explicit kernel mappings
 to reduce the classification error.
+
+线性模型在 MNIST 数据上的相对较高的错误率表明输入数据不是可线性分割的。我们将使用特定的内核
+映射来降低分类误差。
 
 **Intuition:** The high-level idea is to use a non-linear map to transform the
 input space to another feature space (of possibly higher dimension) where the
 (transformed) features are (almost) linearly separable and then apply a linear
 model on the mapped features. This is shown in the following figure:
+
+**直觉上：** 总体思路是用一个非线性的映射关系将输入空间转换到另一个特征空间（可能有更高的维数），
+这个特征空间几乎是线性可分割的，然后把一个线性模型应用到这个映射特征空间里。这个过程可以通过
+下面这张图反映：
 
 <div style="text-align:center">
 <img src="https://www.tensorflow.org/versions/master/images/kernel_mapping.png" />
@@ -216,11 +225,18 @@ model on the mapped features. This is shown in the following figure:
 
 
 ### Technical details
+### 技术细节
+
 In this example we will use **Random Fourier Features**, introduced in the
 ["Random Features for Large-Scale Kernel Machines"](https://people.eecs.berkeley.edu/~brecht/papers/07.rah.rec.nips.pdf)
 paper by Rahimi and Recht, to map the input data. Random Fourier Features map a
 vector \\(\mathbf{x} \in \mathbb{R}^d\\) to \\(\mathbf{x'} \in \mathbb{R}^D\\)
 via the following mapping:
+
+这个例子中我们将使用 **随机傅里叶特征**，在 Rahimi 和 Recht 的论文中首次引进，
+["大规模内核机器的随机特征"](https://people.eecs.berkeley.edu/~brecht/papers/07.rah.rec.nips.pdf)
+来做输入输入数据的映射。随机傅里叶特征通过如下方式将矢量 \\(\mathbf{x} \in \mathbb{R}^d\\)
+映射到 \\(\mathbf{x'} \in \mathbb{R}^D\\)：
 
 $$
 RFFM(\cdot): \mathbb{R}^d \to \mathbb{R}^D, \quad
@@ -235,6 +251,9 @@ In this example, the entries of \\(\mathbf{\Omega}\\) and \\(\mathbf{b}\\) are
 sampled from distributions such that the mapping satisfies the following
 property:
 
+在本例中，\\(\mathbf{\Omega}\\) 和 \\(\mathbf{b}\\) 的实体是分布中取样得来的以使
+映射具有如下性质：
+
 $$
 RFFM(\mathbf{x})^T \cdot RFFM(\mathbf{y}) \approx
 e^{-\frac{\|\mathbf{x} - \mathbf{y}\|^2}{2 \sigma^2}}
@@ -248,6 +267,8 @@ much higher dimensional space than the original one. See
 for more details.
 
 ### Kernel classifier
+### 内核分类器
+
 @{tf.contrib.kernel_methods.KernelLinearClassifier} is a pre-packaged
 `tf.contrib.learn` estimator that combines the power of explicit kernel mappings
 with linear models. Its constructor is almost identical to that of the
@@ -256,6 +277,9 @@ explicit kernel mappings to be applied to each feature the classifier uses. The
 following code snippet demonstrates how to replace LinearClassifier with
 KernelLinearClassifier.
 
+@{tf.contrib.kernel_methods.KernelLinearClassifier} 是一个预先打包的 `tf.contrib.learn`
+估测器，结合了线性模型和特定内核映射的优点。它的构造器几乎与拥有可以配置
+一系列内核映射用于分类器使用的每一个特征的选项的线性分类估测器相同。
 
 ```python
 # Specify the feature(s) to be used by the estimator. This is identical to the
