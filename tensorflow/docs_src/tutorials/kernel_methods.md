@@ -146,20 +146,24 @@ estimator is as follows:
 import time
 
 # Specify the feature(s) to be used by the estimator.
+# 指定估测器要使用的特征
 image_column = tf.contrib.layers.real_valued_column('images', dimension=784)
 estimator = tf.contrib.learn.LinearClassifier(feature_columns=[image_column], n_classes=10)
 
 # Train.
+# 训练
 start = time.time()
 estimator.fit(input_fn=train_input_fn, steps=2000)
 end = time.time()
 print('Elapsed time: {} seconds'.format(end - start))
 
 # Evaluate and report metrics.
+# 评估并报告结果
 eval_metrics = estimator.evaluate(input_fn=eval_input_fn, steps=1)
 print(eval_metrics)
 ```
 The following table summarizes the results on the eval data.
+下面这张表总结了评估数据的结果。
 
 metric        | value
 :------------ | :------------
@@ -168,6 +172,7 @@ accuracy      | 92.5%
 training time | ~25 seconds on my machine
 
 Note: Metrics will vary depending on various factors.
+注意：评估结果会因各种因素的影响而不同。
 
 In addition to experimenting with the (training) batch size and the number of
 training steps, there are a couple other parameters that can be tuned as well.
@@ -178,6 +183,10 @@ As an example, the following code constructs a LinearClassifier estimator that
 uses the Follow-The-Regularized-Leader (FTRL) optimization strategy with a
 specific learning rate and L2-regularization.
 
+除了可以试验不同的批次大小和训练步骤的数量，有一些其他的因素同样可以被调优。
+例如，你可以通过从[可用优化器列表](https://www.tensorflow.org/code/tensorflow/python/training)
+明确地选择另外的用于最小化损失函数的优化器来改变优化方法。作为示例，下面的代码构造了一个使用
+特定学习速率和 L2 正规化的FTRL(Follow-The-Regularized-Leader) 优化策略的线性分类估测器。
 
 ```python
 optimizer = tf.train.FtrlOptimizer(learning_rate=5.0, l2_regularization_strength=1.0)
@@ -187,6 +196,7 @@ estimator = tf.contrib.learn.LinearClassifier(
 
 Regardless of the values of the parameters, the maximum accuracy a linear model
 can achieve on this dataset caps at around **93%**.
+不管这些参数的值，线性模型在这个数据集上能取得的最大精确度约为**93%**。
 
 ---------------- today line --------------------
 
