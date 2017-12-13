@@ -266,6 +266,9 @@ much higher dimensional space than the original one. See
 [Radial basis function kernel](https://en.wikipedia.org/wiki/Radial_basis_function_kernel)
 for more details.
 
+上面表达式右边的式子就是著名的 RBF （高斯）内核函数。这个函数是机器学习中应用最广泛的内核函数之一，
+相比原始函数可以在不同和更高的维度空间中模糊的衡量相似性。
+
 ### Kernel classifier
 ### 内核分类器
 
@@ -284,6 +287,8 @@ KernelLinearClassifier.
 ```python
 # Specify the feature(s) to be used by the estimator. This is identical to the
 # code used for the LinearClassifier.
+# 指定估测器将要使用的特征。这和线性分类器中的代码是相同的。
+
 image_column = tf.contrib.layers.real_valued_column('images', dimension=784)
 optimizer = tf.train.FtrlOptimizer(
    learning_rate=50.0, l2_regularization_strength=0.001)
@@ -296,12 +301,14 @@ estimator = tf.contrib.kernel_methods.KernelLinearClassifier(
    n_classes=10, optimizer=optimizer, kernel_mappers=kernel_mappers)
 
 # Train.
+# 训练。
 start = time.time()
 estimator.fit(input_fn=train_input_fn, steps=2000)
 end = time.time()
 print('Elapsed time: {} seconds'.format(end - start))
 
 # Evaluate and report metrics.
+# 评估和报告结果。
 eval_metrics = estimator.evaluate(input_fn=eval_input_fn, steps=1)
 print(eval_metrics)
 ```
@@ -311,6 +318,9 @@ corresponding feature column. The following lines instruct the classifier to
 first map the initial 784-dimensional images to 2000-dimensional vectors using
 random Fourier features and then learn a linear model on the transformed
 vectors:
+唯一增加的一个参数是传递给 `KernelLinearClassifier` 的一个应用在特征列上的
+从特征列映射到一组内核映射的字典。下面的几行构造了使用随机傅立叶特征来映射初始化的 784 维图像到一个
+2000 维的矢量的一个分类器，然后在经过转换的矢量上进行学习。
 
 ```python
 kernel_mapper = tf.contrib.kernel_methods.RandomFourierFeatureMapper(
@@ -323,9 +333,15 @@ Notice the `stddev` parameter. This is the standard deviation (\\(\sigma\\)) of
 the approximated RBF kernel and controls the similarity measure used in
 classification. `stddev` is typically determined via hyperparameter tuning.
 
+注意 `stddev` 参数。它是 RBF 内核近似的标准差并在分类任务里用于控制相似性衡量。
+`stddev` 通常通过高级参数调教决定。
+
 The results of running the preceding code are summarized in the following table.
 We can further increase the accuracy by increasing the output dimension of the
 mapping and tuning the standard deviation.
+
+先前代码的运行结果总结在下面这张表里。我们可以通过提高映射输出维数和对标准差调优
+进一步提高准确性。
 
 metric        | value
 :------------ | :------------
@@ -341,6 +357,10 @@ different values of stddev. The optimal value is stddev=5.0. Notice how too
 small or too high stddev values can dramatically decrease the accuracy of the
 classification.
 
+分类的质量对 stddev 的值非常敏感。下面这张表显示的是分类器在不同 stddev 上的
+评估数据的准确性。最优值是 stddev=5.0。注意看太大或者太小的 stddev 值是怎样迅速的
+拉低分类的准确性的。
+
 stddev | eval accuracy
 :----- | :------------
 1.0    | 0.1362
@@ -351,6 +371,7 @@ stddev | eval accuracy
 16.0   | 0.8878
 
 ### Output dimension
+### 输出维数
 Intuitively, the larger the output dimension of the mapping, the closer the
 inner product of two mapped vectors approximates the kernel, which typically
 translates to better classification accuracy. Another way to think about this is
@@ -360,16 +381,24 @@ However, after a certain threshold, higher output dimensions increase the
 accuracy by very little, while making training take more time. This is shown in
 the following two Figures which depict the eval accuracy as a function of the
 output dimension and the training time, respectively.
+直觉上，映射的输出维数越大，两个映射的矢量的内积越近似这个内核，通常都会转化成更好的分类准确性。
+另一个思考这个问题的方式是输出维数等于线性模型的权重数；维数越大，模型的自由度越大。
+然而，超过一定的阈值，随着训练次数的增加，高输出维数对准确性的提升作用越来越小。下面
+两张图分别描述了评价准确性对输出维数和训练时间的函数变化
 
 ![image](https://www.tensorflow.org/versions/master/images/acc_vs_outdim.png)
 ![image](https://www.tensorflow.org/versions/master/images/acc-vs-trn_time.png)
 
 
 ## Summary
+## 总结
 Explicit kernel mappings combine the predictive power of nonlinear models with
 the scalability of linear models. Unlike traditional dual kernel methods,
 explicit kernel methods can scale to millions or hundreds of millions of
 samples. When using explicit kernel mappings, consider the following tips:
+
+特定内核映射结合了非线性模型的前瞻性和线性模型的可伸缩性的优点。与传统的多核心方法相比，
+特定内核方法可以覆盖几十万到几千万量级的实例。当运用特定内核映射时，请考虑如下几点：
 
 * Random Fourier Features can be particularly effective for datasets with dense
 features.
@@ -379,3 +408,7 @@ optimal values.
 * If you have multiple numerical features, concatenate them into a single
 multi-dimensional feature and apply the kernel mapping to the concatenated
 vector.
+
+* 对于密集特征数据集，随机傅立叶特征特别有效
+* 内核映射的参数经常是独立于数据的。模型质量对于这些参数非常敏感。使用超参数调优找到最优值。
+* 如果有多个数字特征，把他们连接到一个单独的多维特征中然后在这些连接数据上运用内核映射。
