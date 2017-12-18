@@ -8,7 +8,7 @@ kernel methods, explicit (primal) kernel methods scale well with the size of the
 training dataset both in terms of training/inference times and in terms of
 memory requirements.
 
-在这篇教程里，我们将示范如何使用特定的内核方法在不大幅增加和推理时间的情况下大幅提升线性模型的
+在这篇教程里，我们将示范如何把特定内核方法和线性模型结合起来在不明显增加训练和推理时间的情况下大幅度提升
 预测质量。与多内核方法不同，特定核心方法对训练数据集的大小具有很好的可扩展性，不管是在训练和推理时间上
 还是在内存占用上。
 
@@ -18,8 +18,8 @@ already have at least basic knowledge of kernel methods and Support Vector
 Machines (SVMs). If you are new to kernel methods, refer to either of the
 following sources for an introduction:
 
-**主要读者：** 尽管我们提供一个特定核心方法相关概念的高层概览，这个教程的主要目标读者至少
-要了解内核方法和支持向量机的基础知识，可以参考以下的资源做一个了解：
+**目标读者：** 尽管我们提供的只是特定内核方法相关概念的一个概览，教程的主要目标读者
+依然要具备内核方法和支持向量机的基础知识，这些知识可以参考以下的资源做一个了解：
 
 * If you have a strong mathematical background:
 [Kernel Methods in Machine Learning](https://arxiv.org/pdf/math/0701907.pdf)
@@ -32,7 +32,7 @@ following sources for an introduction:
 Currently, TensorFlow supports explicit kernel mappings for dense features only;
 TensorFlow will provide support for sparse features at a later release.
 
-目前，TensorFlow 只支持对于密集特征的特定特定方法映射。对于稀疏特征的支持将在后面的发布版本中提供。
+目前，TensorFlow 只支持对于密集特征的特定内核映射。对于稀疏特征的支持将在后面的发布版本中提供。
 
 This tutorial uses [tf.contrib.learn](https://www.tensorflow.org/code/tensorflow/contrib/learn/python/learn)
 (TensorFlow's high-level Machine Learning API) Estimators for our ML models.
@@ -41,7 +41,7 @@ is a good place to start. We will use the MNIST dataset. The tutorial consists
 of the following steps:
 
 本教程使用 [tf.contrib.learn](https://www.tensorflow.org/code/tensorflow/contrib/learn/python/learn)
-（TensorFlow 高级机器学习接口）估测器作为我们的机器学习模型。如果你对这份 API 不熟悉，可以参考
+（TensorFlow 机器学习高级接口）估测器作为我们的机器学习模型。如果你对这份 API 不熟悉，可以参考
 [tf.estimator Quickstart](https://www.tensorflow.org/get_started/estimator)。
 我们将使用 MNIST 教程中提到数据集。本教程包含以下步骤：
 
@@ -70,9 +70,10 @@ respectively. Each split contains one numpy array for images (with shape
 tutorial, we only use the train and validation splits to train and evaluate our
 models respectively.
 
-上面的方法下载了 MNIST 全部数据集（包含 70K 的样本），并分成大小分别为 55K, 5K 和 10K 的
-训练，验证和测试集。每次分割包含一个 numpy 图像数组（shape 为 [样本大小, 784]）和一个
-numpy 标签数组（shape 为 [样本大小, 1])。在本教程中，我们只是用训练和验证集来分别训练和验证我们的模型。
+上面的方法下载了整个 MNIST 数据集（包含 70K 的样本），并分成大小分别为 55K,
+ 5K 和 10K 的训练，验证和测试集。每次分割包含一个 numpy 图像数组
+ （shape 为 [样本大小, 784]）和一个 numpy 标签数组（shape 为 [样本大小, 1])。
+ 在本教程中，我们仅使用训练和验证集来分别训练和验证我们的模型。
 
 In order to feed data to a tf.contrib.learn Estimator, it is helpful to convert
 it to Tensors. For this, we will use an `input function` which adds Ops to the
@@ -87,14 +88,15 @@ preparing the data is shown in the snippet below. In this example, we use
 mini-batches of size 256 for training and the entire sample (5K entries) for
 evaluation. Feel free to experiment with different batch sizes.
 
-给 tf.contrib.learn 估测器输入数据，把数据转换成张量会更方便。为了做到这一点，我们是用一个
-`input function` 的方法，它会给 TensorFlow 计算图添加选项，执行时会创建下游使用的小批次张量。
-更多关于 `input function` 的背景消息请参考@{$get_started/input_fn$Building Input Functions with tf.contrib.learn}.
-在这个例子中，我们将使用 `tf.train.shuffle_batch` 选项，这个选项除了可以将 numpy
-数组转换张量之外，还允许我们指定每次 input_fn 选项运行时批次的大小和是否将输入随机化
-(随机化通常会加快训练过程中的收敛)。下载和准备数据的完整代码加载下面的片段里。
-本例中，我们训练使用最小的批次大小 256，评估使用整个的评估样本（5K）。你可以使用其他的
-批次大小进行试验。
+给 tf.contrib.learn 估测器输入数据时，把数据转换成张量会更方便。
+为了做到这一点，我们使用一个`input function` 的方法，它会给 TensorFlow
+计算图添加选项，执行时会创建下游使用的小批次张量。更多关于 `input function`
+的背景消息请参考@{$get_started/input_fn$Building Input Functions with tf.contrib.learn}.
+在本例中，我们将使用 `tf.train.shuffle_batch` 选项，这个选项除了可以将 numpy
+数组转换张量之外，还允许我们指定每次 input_fn 选项运行时批次的大小以及是否将输入随机化
+(随机化通常会加快训练过程中的收敛)。下载和准备数据的完整代码在下面的代码片段里。
+例中，我们将训练中的子批次大小设置为 256，并使用整个的评估样本（5K）进行评估。
+你也可以对其他的批次大小进行试验。
 
 ```python
 import numpy as np
@@ -131,7 +133,7 @@ We can now train a linear model over the MNIST dataset. We will use the
 be specified as follows:
 
 现在我们可以使用 MNIST 数据集训练一个线性模型。我们将使用 @{tf.contrib.learn.LinearClassifier}
-带有 10 个分类估测器代表 10 个数字。输入特征组成一个 784 维的密集向量，可以通过如下方式指定：
+估测器，10 个分类分别用 0-9 表示。输入特征组成一个 784 维的密集向量，可以通过如下方式指定：
 
 ```python
 image_column = tf.contrib.layers.real_valued_column('images', dimension=784)
@@ -185,7 +187,7 @@ specific learning rate and L2-regularization.
 
 除了可以试验不同的批次大小和训练步骤的数量，有一些其他的因素同样可以被调优。
 例如，你可以通过从[可用优化器列表](https://www.tensorflow.org/code/tensorflow/python/training)
-明确地选择另外的用于最小化损失函数的优化器来改变优化方法。作为示例，下面的代码构造了一个使用
+明确地选择另外的优化器，改变用于最小化损失函数的优化方法来优化评估结果。作为示例，下面的代码构造了一个使用
 特定学习速率和 L2 正规化的FTRL(Follow-The-Regularized-Leader) 优化策略的线性分类估测器。
 
 ```python
@@ -198,10 +200,9 @@ Regardless of the values of the parameters, the maximum accuracy a linear model
 can achieve on this dataset caps at around **93%**.
 不管这些参数的值，线性模型在这个数据集上能取得的最大精确度约为**93%**。
 
----------------- today line --------------------
 
 ## Using explicit kernel mappings with the linear model.
-## 使用特定的内核与线性模型相对应
+## 在线性模型上使用特定内核映射
 
 The relatively high error (~7%) of the linear model over MNIST indicates that
 the input data is not linearly separable. We will use explicit kernel mappings
@@ -216,7 +217,7 @@ input space to another feature space (of possibly higher dimension) where the
 model on the mapped features. This is shown in the following figure:
 
 **直觉上：** 总体思路是用一个非线性的映射关系将输入空间转换到另一个特征空间（可能有更高的维数），
-这个特征空间几乎是线性可分割的，然后把一个线性模型应用到这个映射特征空间里。这个过程可以通过
+这个特征空间几乎是可线性分割的，然后把一个线性模型应用到这个映射特征空间里。这个过程可以通过
 下面这张图反映：
 
 <div style="text-align:center">
@@ -233,9 +234,9 @@ paper by Rahimi and Recht, to map the input data. Random Fourier Features map a
 vector \\(\mathbf{x} \in \mathbb{R}^d\\) to \\(\mathbf{x'} \in \mathbb{R}^D\\)
 via the following mapping:
 
-这个例子中我们将使用 **随机傅里叶特征**，在 Rahimi 和 Recht 的论文中首次引进，
-["大规模内核机器的随机特征"](https://people.eecs.berkeley.edu/~brecht/papers/07.rah.rec.nips.pdf)
-来做输入输入数据的映射。随机傅里叶特征通过如下方式将矢量 \\(\mathbf{x} \in \mathbb{R}^d\\)
+这个例子中我们将使用 **随机傅里叶特征**，在 Rahimi 和 Recht 的对输入数据做映射的论文中首次引进，
+["大规模内核机器的随机特征"](https://people.eecs.berkeley.edu/~brecht/papers/07.rah.rec.nips.pdf)。
+随机傅里叶特征通过如下方式将矢量 \\(\mathbf{x} \in \mathbb{R}^d\\)
 映射到 \\(\mathbf{x'} \in \mathbb{R}^D\\)：
 
 $$
@@ -267,7 +268,7 @@ much higher dimensional space than the original one. See
 for more details.
 
 上面表达式右边的式子就是著名的 RBF （高斯）内核函数。这个函数是机器学习中应用最广泛的内核函数之一，
-相比原始函数可以在不同和更高的维度空间中模糊的衡量相似性。
+相比原始函数它可以在不同和更高的维度空间中模糊地衡量相似性。
 
 ### Kernel classifier
 ### 内核分类器
@@ -280,9 +281,10 @@ explicit kernel mappings to be applied to each feature the classifier uses. The
 following code snippet demonstrates how to replace LinearClassifier with
 KernelLinearClassifier.
 
-@{tf.contrib.kernel_methods.KernelLinearClassifier} 是一个预先打包的 `tf.contrib.learn`
-估测器，结合了线性模型和特定内核映射的优点。它的构造器几乎与拥有可以配置
-一系列内核映射用于分类器使用的每一个特征的选项的线性分类估测器相同。
+@{tf.contrib.kernel_methods.KernelLinearClassifier} 是一个
+预先打包的 `tf.contrib.learn` 估测器，结合了线性模型和特定内核映射的优点。
+它的构造器几乎与可配置内核映射的线性分类估测器相同。
+下面的代码演示如何使用线性内核分类器替换线性分类器。
 
 ```python
 # Specify the feature(s) to be used by the estimator. This is identical to the
@@ -318,8 +320,9 @@ corresponding feature column. The following lines instruct the classifier to
 first map the initial 784-dimensional images to 2000-dimensional vectors using
 random Fourier features and then learn a linear model on the transformed
 vectors:
-唯一增加的一个参数是传递给 `KernelLinearClassifier` 的一个应用在特征列上的
-从特征列映射到一组内核映射的字典。下面的几行构造了使用随机傅立叶特征来映射初始化的 784 维图像到一个
+
+唯一增加的一个参数是传递给 `KernelLinearClassifier` 的一个字典，这个字典提供
+从特征列到一组内核的映射。下面的几行构造了使用随机傅立叶特征来映射初始化的 784 维图像到一个
 2000 维的矢量的一个分类器，然后在经过转换的矢量上进行学习。
 
 ```python
@@ -334,7 +337,7 @@ the approximated RBF kernel and controls the similarity measure used in
 classification. `stddev` is typically determined via hyperparameter tuning.
 
 注意 `stddev` 参数。它是 RBF 内核近似的标准差并在分类任务里用于控制相似性衡量。
-`stddev` 通常通过高级参数调教决定。
+`stddev` 通常通过超参数调教决定。
 
 The results of running the preceding code are summarized in the following table.
 We can further increase the accuracy by increasing the output dimension of the
@@ -351,6 +354,7 @@ training time | ~35 seconds on my machine
 
 
 ### stddev
+
 The classification quality is very sensitive to the value of stddev. The
 following table shows the accuracy of the classifier on the eval data for
 different values of stddev. The optimal value is stddev=5.0. Notice how too
@@ -359,7 +363,7 @@ classification.
 
 分类的质量对 stddev 的值非常敏感。下面这张表显示的是分类器在不同 stddev 上的
 评估数据的准确性。最优值是 stddev=5.0。注意看太大或者太小的 stddev 值是怎样迅速的
-拉低分类的准确性的。
+降低分类的准确性的。
 
 stddev | eval accuracy
 :----- | :------------
@@ -372,6 +376,7 @@ stddev | eval accuracy
 
 ### Output dimension
 ### 输出维数
+
 Intuitively, the larger the output dimension of the mapping, the closer the
 inner product of two mapped vectors approximates the kernel, which typically
 translates to better classification accuracy. Another way to think about this is
@@ -381,6 +386,7 @@ However, after a certain threshold, higher output dimensions increase the
 accuracy by very little, while making training take more time. This is shown in
 the following two Figures which depict the eval accuracy as a function of the
 output dimension and the training time, respectively.
+
 直觉上，映射的输出维数越大，两个映射的矢量的内积越近似这个内核，通常都会转化成更好的分类准确性。
 另一个思考这个问题的方式是输出维数等于线性模型的权重数；维数越大，模型的自由度越大。
 然而，超过一定的阈值，随着训练次数的增加，高输出维数对准确性的提升作用越来越小。下面
