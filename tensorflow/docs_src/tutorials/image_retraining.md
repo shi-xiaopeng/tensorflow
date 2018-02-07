@@ -147,7 +147,7 @@ TensorBoard 运行之后，打开浏览器进到 `localhost:6006` 地址去看 T
 下面的脚本将产生一个版本的 Inception v3 网络，
 其最后一层已经使用 `/tmp/output_graph.pb` 下的分类
 以及 `/tmp/output_labels.txt` 下的标签训练完毕。
-这些都是用图像识别 C++ 以及 Python 图像分类示例能够读取的格式存储，
+这些都是用图像识别 @{$image_recognition$C++ and Python image classification examples} 能够读取的格式存储，
 所以你可以立即使用这些新模型。由于你替换了顶层节点，
 所以你需要在脚本中指定一个新名字，例如如果你正在使用 label_image 的话，
 你可以使用 `--output_layer=final_result` 标志进行改变。
