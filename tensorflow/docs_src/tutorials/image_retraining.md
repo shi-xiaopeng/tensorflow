@@ -1,6 +1,9 @@
 # 如何再训练 Inception 的最后一层识别新分类
 
-当前的对象识别模型拥有数十万计的参数，花费数周的时间来整个训练。
+原文链接：https://www.tensorflow.org/tutorials/image_retraining
+
+
+当前的对象识别模型拥有数百万计的参数，完整地训练整个模型需要花费数周的时间。
 迁移学习是一种能够大幅缩短这一过程的一种技术，
 它通过将一个已经完整训练过的模型如 ImageNet 重新训练来识别新的分类。
 在本例中我们将从零开始训练模型的最后一层并保留其他部分不变。
@@ -264,7 +267,7 @@ bazel-bin/tensorflow/examples/image_retraining/label_image \
 
 开始时给每个选项设置 5 或 10 是合理的，
 然后再实验具体哪些值会对你的应用有所帮助。
-`--flip_left_right` 将随机地水平镜面反映一半的图像，
+`--flip_left_right` （左右翻转）将随机地水平镜像一半的图像，
 只要这些镜面对称图像有可能出现在你的应用中，你设置此选项就是合理的。
 例如镜面对称出现在文字识别中就不是一个好主意，因为文字的反转会破坏它们的语义。
 
@@ -282,7 +285,7 @@ bazel-bin/tensorflow/examples/image_retraining/label_image \
 
 ## 训练、验证和测试集
 
-当你把脚本指向一个图片文件夹时所做的其中一件事是把他们划分成三个不同的集合。
+当你把脚本指向一个图片文件夹时，代码所做的事情之一就是把它们划分成三个不同的图片集合。
 通常最大的集合为训练集，这里的全部图片都用与训练的输入，
 并用图片的结果来不断调整模型的权重。
 
@@ -341,7 +344,7 @@ bazel-bin/tensorflow/examples/image_retraining/label_image \
 你可能需要牺牲一点准确性以获得更小的文件体积或者更快的速度。
 为了能帮助做到这些，这个
 [retrain.py script](https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/image_retraining/retrain.py)
-支持 32 中不同的[移动架构](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html)衍生版本。
+支持 32 中不同的[Mobilenet 架构](https://research.googleblog.com/2017/06/mobilenets-open-source-models-for.html)衍生版本。
 
 
 相比 Inception v3 这些衍生版本精确度要差一些，
@@ -371,5 +374,5 @@ python tensorflow/examples/image_retraining/retrain.py \
 如果你要在标签图片或者你自己的程序中使用 Mobilenet 模型，
 你需要输入被转换成一个浮动的区间的特定大小的图片到`input` 张量中。
 典型的 24 位图片的范围是 [0, 255]，你必须把他们通过公式 `(image - 128.)/128.`
-转换到模型期望的 [-1, 1] 浮动区间内。
+转换到模型期望的 [-1, 1] 浮点数区间内。
 
